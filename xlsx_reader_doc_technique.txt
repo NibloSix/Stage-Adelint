@@ -1,0 +1,61 @@
+Le fichier xlsx_reader.py contient une fonction principale à exécuter 
+(lecteur_xlsx) qui va appeler les autres fonctions. Tout d'abord, le 
+programme récupère les informations nécessaires grâce au fichier de 
+config, l'odf et la maquette.
+
+L'odf peut être lu avec 2 fonctions :
+    - lecteurOdf_mcc_reader : utilise mcc_reader.py => mieux car permet 
+    de lire le nombre de cours prévu dans l'odf, mais ne marche que pour 
+    l'odf des 1SN (car elle ne prend pas en compte les parcours des 
+    autres années)
+    - lecteurOdf_xlsx2odf : utilise xlsx2odf => marche pour tous les 
+    odf mais ne lit pas le nombre de cours prévu
+Ces fonctions renvoient un dictionnaire des matières avec pour clés les 
+codes apogée des matières et en valeur un objet de la classe Matière.
+
+La maquette est lue par la fonction lecteurMaquette. Elle trouve les 
+colonnes utiles dans l'onglet maquette puis lit ligne par ligne la 
+maquette en récupérant les acronymes et les dépendances (s'il y en a).
+Elle vérifie également qu'il n'y ait pas plusieurs fois les mêmes 
+acronymes pour différentes matières du même semestre.
+
+Ensuite, on récupère les alias des profs avec ade_enseignants dans 
+edt_matieres et lecteurAlias.
+
+Puis on lit l'edt page par page en commençant à la page indiquée.
+Si le nom de la matière contient :
+    - "S2" : on incrémente le semestre
+    - "1" ou "1_vacances" : on incrémente l'année
+    - "vacance" : on ignore la page
+
+Sur chaque page, on vérifie si la disposition des jours a changé. 
+(les jours doivent être sur la ligne 6). Si elle a changé ou qu'elle
+n'était pas encore défini, on génère grâce à generateurColonne des 
+dicitonnaires qui indiquent quelle colonne correspond à quel jour 
+et à quel TD. On récupère également la ligne qui correspond à 8h-9h.
+
+Pour chaque page, on boucle sur les cellules fusionnées pour récupérer
+les cours. On ignore les cases "A1","E4","J4","K4" qui peuvent être 
+fusionnées, mais qui ne correspondent pas à un cours. On crée un nouveau
+cours. Ce qu'il y a entre crochet correspond à une note pour le cours.
+On applique ensuite la fonction analyserElement sur chaque mot et groupe 
+de mots qui sont dans la case du cours. On commence par le plus grand 
+groupe de mots puis tant qu'il reste des mots incompris on recommence 
+avec un groupe de mots plus petit. On récupére ainsi les différentes 
+informations pouvant être sur un cours (matière, nature, groupe, numéro, 
+enseignant) en ignorant les mots inutiles qui sont dans la liste ignores. 
+On affiche les mots incompris restants.
+
+S'il n'y a pas eu de mots incompris et qu'il y avait une matière et une 
+nature dans le cours, on finit la création du cours en récupérant : la 
+semaine, le jour, l'heure, la durée, les groupes. On rajoute ce cours 
+dans le fichier csv des cours.
+
+Ensuite, on vérifie :
+    - si le numéro du cours est précisé dans l'edt, qu'il soit cohérent
+    avec son emplacement dans l'edt.
+    - que tous les TDs aient le même nombre de séances de chaque nature de 
+    chaque matière
+    - que le nombre de séances de chaque nature de chaque matière soit 
+    le même que celui sur l'odf (s'il est lu par le lecteur d'odf)
+    - les dépendances grâce à lecteurDependance et à comparaison

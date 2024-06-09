@@ -1,0 +1,65 @@
+# TOML config file
+# Utiliser avec python: pip install pytomlpp
+
+
+[naturesPossibles]
+"pres" = ["presentation", "pres"] 
+"e" = ["examen", "e", "exa", "ex", "exam"]
+"c" = ["cm", "cours", "c"]
+"ctd" = ["ctd"]
+"td" = ["td"]
+"tp" = ["tp"]
+"be" = ["be"]
+"oral" = ["oral", "oraux", "examen oral", "exo"]
+"pr" = ["projet", "pr"]
+"tppr" = ["tppr"]
+"spr" = ["spr"]
+"bilan" = ["bilan"]
+"s" = ["soutien", "s"]
+    
+
+[ignores]
+ignores = [
+    "+", 
+    "lundi", 
+    "mardi", 
+    "mercredi", 
+    "jeudi", 
+    "vendredi",  
+    "creneau cms recupere", 
+    "cms recupere",
+    "matiere", 
+    "prof/n", "1/n", 
+    "eps", 
+    "cam", 
+    "langue", 
+    "shs", 
+    "wei", 
+    "libre", 
+    "comm", 
+    "master",
+    "enm",
+    "ferie", 
+    "armistice",
+    "ascension",
+    "pentecote",
+    "vacances", 
+    "toussaint", 
+    "noel", 
+    "ski", 
+    "paques"
+]
+
+
+[TDPossible]
+"1SN" = ["AB","CD","EF","GH","IJ","KL","MN"]
+"2SN" = ["T","R","A","B","M","L12","L34"]
+"3SN" = ["T","I","E","L12","L34","B","M"]
+
+
+[infoEdt]
+annee = 2024    #année de la première semaine de l'edt
+semestre = 1    #semestre de la première semaine de l'edt
+
+
+

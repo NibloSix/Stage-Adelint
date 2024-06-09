@@ -1,0 +1,110 @@
+Vérification des edt Excel
+
+# Principe
+
+Ce document décrit comment utiliser xlsx_reader.py.
+Ce programme permet de vérifier si un emploi du temps au format Excel (format décrit 
+dans edt_matieres.txt) est correct :
+    - pour chaque cours, il faut :
+        - qu'il soit dans une case fusionnée dans l'emploi du temps (toutes les cases 
+        fusionnées seront considérées comme des cours)
+        - un nom de matière (le nom complet ou un acronyme définit dans la maquette)
+        - une nature de cours (cm, td, tp, examen...) avec éventuellement le numéro du 
+        cours attaché ou non
+        - il peut y avoir un ou plusieurs enseignants (le prof doit être écrit avec son 
+        alias comme dans instructor-default-aliases.csv ou avec son nom de famille grâce 
+        à ade_enseignants() dans edt_matieres.py)
+        - il peut y avoir le groupe de TD (GR1, GR2...) mais ça ne sera pas pris en compte
+    - il vérifie que tous les groupes de TD ont le même nombre de cours
+    - il vérifie que le nombre de séances est cohérent avec l'offre de formation 
+    (uniquement si l'odf peut être lu avec mcc_reader.py)
+    - il vérifie que les dépendances écrites sur la maquette sont bien respectées.
+
+Ce programme crée également 2 fichiers :
+    - un fichier csv contenant tous les cours de l'edt
+    - un fichier txt contenant toutes les dépendances des matières (ordre des cours)
+    
+
+
+# Utilisation 
+
+Pour exécuter le programme, il faut lancer la fonction lecteur_xlsx() avec pour paramètres :
+    - le nom du fichier de config (xlsx_reader_config.toml)
+    - le nom du fichier de l'emploi du temps
+    - le numéro de la page (la numérotation commence à 1) à laquelle débute l'edt (après 
+    les onglets maquette et alias)
+    - le nom de la maquette (cela peut être le même que celui de l'edt)
+    - le nom du fichier avec la liste des enseignants (instructor.csv)
+    - le nom du fichier d'alias des profs (instructor-default-aliases.csv)
+    - le nom du fichier de l'offre de formation
+    - le lecteur qui permet de lire l'odf (lecteurOdf_mcc_reader pour les 1SN ou 
+    lecteurOdf_xlsx2odf pour les autres)
+    - le nom souhaité du fichier csv contenant les cours
+    - le nom souhaité du fichier de dépendances
+    - le niveau du logger souhaité (par défaut à WARNING)
+
+
+
+# Fichier de config
+
+Le fichier de config doit être sous la forme de xlsx_reader_config.toml avec :
+    - les natures possibles pour les cours
+    - les mots à ignorer dans les cours
+    - les groupes de TD possibles en fonction des années
+    - l'année de début de l'edt
+    - le semestre de début de l'edt
+
+
+
+# Dépendances
+
+Les dépendances peuvent être rajoutées dans la maquette pour que le programme 
+vérifie que l'ordre des cours est bien respecté pour tous les TDs.
+Pour ce faire, il faut rajouter une colonne (n'importe où) dans la maquette qui 
+s'appelle "Dépendances" et suivre ce format :
+    - les dépendances s'écrivent pour une matière 
+    - il faut écrire la nature du cours et le numéro de la séance attachés 
+    (ex : "c1" pour comparer le CM numéro 1)
+    - pour comparer plusieurs cours, il faut mettre soit "<" soit un espace entre 
+    deux cours (ex : "c1<td1"  ou  "c1 td1" compare le CM n°1 avec le TD n°1)
+=> Attention le programme ne peut comprendre que "<" et pas ">"
+=> Un espace est considéré comme "<"
+=> Ne pas mettre d'espace inutile
+
+On peut comparer autant de cours que l'on souhaite.
+=> ex : "c1<td1<tp1<td2<c2"  ou  "c1 td1 tp1 td2 c2"
+
+Si on veut comparer des cours de matières différentes il faut rajouter l'acronyme 
+de la matière devant la nature avec ":" pour les séparés. Il ne faut pas mettre 
+d'espace entre la matière et la nature.
+=> ex : "c1<PB:c1" compare le CM n°1 de la matière actuelle (par rapport à la ligne 
+de la maquette dans laquelle cette dépendance est écrite) avec le CM n°1 de Probabilités
+
+Pour plus d'exemples, voir le fichier de dépendances créé après l'exécution du programme
+
+
+
+# Compréhension du résultat
+
+Après exécution, le programme affichera toutes les erreurs qu'il a trouvé, il pourra afficher :
+
+    - pour la maquette :
+        - le code apogée des matières qui sont présentes dans la maquette mais pas dans l'odf
+        - les matières qui possède des acronymes déja existants pour d'autre matières
+        - les erreurs de format dépendances (si les dépendances ne respectent pas le format 
+        défini au-dessus)
+        - les erreurs dans les dépendances si une nature ou matière n'existe pas
+
+    - pour l'edt :
+        - les mots inconnus dans chaque cours (il affichera aussi la semaine et la cellule du 
+        cours concerné)
+        - les cours qui sont dans le mauvais semestre par rapport à l'odf
+        - les cours où le groupe de TD renseigné (GR1, GR2...) n'est pas le bon par rapport à 
+        la colonne
+        - un set regroupant tous les mots inconnus trouvés dans les cours
+        - les cours où le numéro de séance renseigné n'est pas le bon par rapport à l'ordre 
+        des cours
+        - les matières où chaque TD n'a pas le même nombre de cours
+        - les matières où le nombre de cours ne correspond pas à celui dans l'odf
+        - les dépendances qui ne sont pas vérifiées dans l'edt (indique aussi les TDs pour 
+        lesquels la dépendance n'est pas vérifiée)
