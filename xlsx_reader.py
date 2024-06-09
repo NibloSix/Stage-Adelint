@@ -830,16 +830,16 @@ def lecteurXlsx(nomFichierConfig, nomFichierEdt, pageDebutEdt, nomFichierMaquett
 
 
 if __name__ == "__main__":
-    nomFichierConfig = "xls2ade/src/xlsx_reader_config.toml"
-    nomFichierEdt = "xls2ade/xls/src/edt1sn-2024.xlsx"
+    nomFichierConfig = "xlsx_reader_config.toml"
+    nomFichierEdt = "edt.xlsx"
     pageDebut = 4
-    nomFichierMaquette = "xls2ade/xls/src/edt1sn-2024-maquette.xlsx"    
-    nomFichierInstructor = "xls2ade/src/instructor.csv"
-    nomFichierAlias = "xls2ade/src/instructor-default-aliases.csv"
-    nomFichierOdf = "xls2ade/xls/src/odf1sn-2024.xlsx"
-    nomFichierCsv = "cours1sn.csv"
+    nomFichierMaquette = "maquette.xlsx"    
+    nomFichierInstructor = "instructor.csv"
+    nomFichierAlias = "alias.csv"
+    nomFichierOdf = "odf.xlsx"
+    nomFichierCsv = "cours.csv"
     lecteurOdf = lecteurOdf_mcc_reader
-    nomFichierDependance = "dependances1sn.txt"
+    nomFichierDependance = "dependances.txt"
     lecteurXlsx(nomFichierConfig, nomFichierEdt, pageDebut, nomFichierMaquette, nomFichierInstructor, nomFichierAlias, nomFichierOdf, lecteurOdf, nomFichierCsv, nomFichierDependance, logLevel=logging.WARNING)
 
 
